@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "349368530462",
+    "firebase_url": "https://e-learing-9adc3-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "e-learing-9adc3",
+    "storage_bucket": "e-learing-9adc3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:349368530462:android:8fd311f3bb74e9aa60200f",
+        "android_client_info": {
+          "package_name": "com.aistudio.zsp28.mwnl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAJVHHT1NIoA7WrW5kZ0FLNVMm_EnMo14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
