@@ -1,0 +1,6 @@
+{
+  "name": "ZNC-Science-2028",
+  "description": "Zahira Science Portal & Student Platform for Grade 12 Physical and Bio Science with real-time discussions, syllabus quizzes, and rewards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

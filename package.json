@@ -1,0 +1,18 @@
+{
+  "name": "zsp-28-zahira-science-portal",
+  "version": "1.0.0",
+  "description": "Zahira Science Portal & Student Platform for Grade 12 Physical and Bio Science with real-time discussions, syllabus quizzes, redemption rewards, and admin management.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "zahira",
+    "science-portal",
+    "advanced-level",
+    "education",
+    "sri-lanka",
+    "vercel"
+  ],
+  "author": "Zahira College Mawanella Science Section",
+  "license": "MIT"
+}
