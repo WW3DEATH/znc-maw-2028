@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZNC Science | Zahira National College Science Portal</title>
+  <meta name="description" content="Official Zahira National College Mawanella Science Portal for Grade 12 Physical & Bio Science with real-time quizzes, discussions, rewards redemption, and admin management." />
+  
+  <!-- Browser Tab Icons & Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#580A18" />
+
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            maroon: {
+              DEFAULT: '#580A18',
+              dark: '#3A040E',
+              light: '#7A1325'
+            },
+            gold: {
+              DEFAULT: '#D4AF37',
+              dark: '#B38F24',
+              light: '#F5E6A3'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Material Symbols & Material Icons (High-reliability fallback) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .material-symbols-outlined, .material-icons {
+      font-family: 'Material Symbols Outlined', 'Material Icons' !important;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+      vertical-align: middle;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP BRANDING HEADER -->
+  <header class="bg-maroon text-white sticky top-0 z-40 shadow-md border-b-2 border-gold">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Left: Logo & Title -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('home')">
+        <img src="/logo.jpg" alt="Zahira Crest" class="w-10 h-10 rounded-full border-2 border-gold shadow-sm object-cover bg-white" />
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-extrabold tracking-wider text-gold text-lg">ZNC Science</span>
+            <span class="text-xs bg-maroon-dark px-2 py-0.5 rounded text-gold-light border border-gold/40 hidden sm:inline-block">LIVE PORTAL</span>
+          </div>
+          <p class="text-[11px] text-slate-200 tracking-wide">Zahira National College Mawanella • Science Section</p>
+        </div>
+      </div>
+
+      <!-- Center / Right: Nav Buttons -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Live Firebase Status Indicator -->
+        <div class="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-black/30 border border-emerald-500/40 text-emerald-400 text-xs hidden md:flex">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="firebaseConnectionStatus" class="font-medium">Cloud RTDB Online</span>
+        </div>
+
+        <!-- User Controls / Auth Status -->
+        <div id="authHeaderControls" class="relative flex items-center space-x-2">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-NAVIGATION BAR (App Tabs) -->
+    <nav class="bg-maroon-dark/95 border-t border-maroon-light/40 overflow-x-auto">
+      <div class="max-w-7xl mx-auto px-4 flex space-x-1 py-1.5 min-w-max">
+        <button onclick="navigateTo('home')" id="tab-home" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-white bg-maroon border border-gold/30">
+          <span class="material-symbols-outlined text-[18px]">home</span>
+          <span>Dashboard</span>
+        </button>
+        <button onclick="navigateTo('quiz')" id="tab-quiz" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-maroon/50">
+          <span class="material-symbols-outlined text-[18px]">quiz</span>
+          <span>Wednesday Quizzes</span>
+        </button>
+        <button onclick="navigateTo('leaderboard')" id="tab-leaderboard" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-maroon/50">
+          <span class="material-symbols-outlined text-[18px]">leaderboard</span>
+          <span>Weekly Leaderboard</span>
+        </button>
+        <button onclick="navigateTo('redemption')" id="tab-redemption" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-maroon/50">
+          <span class="material-symbols-outlined text-[18px]">card_giftcard</span>
+          <span>SP Redemption Center</span>
+        </button>
+        <button onclick="navigateTo('discussions')" id="tab-discussions" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-maroon/50">
+          <span class="material-symbols-outlined text-[18px]">forum</span>
+          <span id="discussionsNavLabel">Discussions</span>
+        </button>
+        <button onclick="navigateTo('gemini')" id="tab-gemini" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-maroon/50">
+          <span class="material-symbols-outlined text-[18px] text-amber-300 animate-pulse">auto_awesome</span>
+          <span>Gemini AI Tutor</span>
+          <span class="text-[9px] bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 font-black px-1.5 py-0.2 rounded-full">AI</span>
+        </button>
+        <button onclick="navigateTo('admin')" id="tab-admin" class="nav-tab hidden px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-maroon/50">
+          <span class="material-symbols-outlined text-[18px]">shield_person</span>
+          <span>Admin Portal</span>
+          <span id="navPendingBadge" class="hidden ml-1 px-1.5 py-0.2 bg-amber-500 text-slate-900 rounded-full text-[10px] font-bold">0</span>
+        </button>
+        <button onclick="navigateTo('profile')" id="tab-profile" class="nav-tab px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 text-slate-300 hover:text-white hover:bg-maroon/50">
+          <span class="material-symbols-outlined text-[18px]">account_circle</span>
+          <span>My Profile</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- NOTIFICATION BANNER (Alerts & Confirmations) -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 max-w-md hidden transition-all duration-300 transform translate-y-2">
+    <div id="toastContent" class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center space-x-3">
+      <span id="toastIcon" class="material-symbols-outlined text-gold">info</span>
+      <p id="toastMessage" class="text-sm font-medium">Notification message</p>
+    </div>
+  </div>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- VIEW 1: HOME DASHBOARD -->
+    <section id="view-home" class="app-view space-y-6">
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-maroon to-maroon-dark text-white p-6 sm:p-8 shadow-lg border border-gold/30">
+        <div class="relative z-10 max-w-2xl space-y-3">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gold/20 text-gold-light border border-gold/40">
+            Zahira College Mawanella • Est. 1928
+          </span>
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
+            Academic Excellence Through <span class="text-gold">Science & Innovation</span>
+          </h1>
+          <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+            Welcome to the Grade 12 Physical & Biological Science digital platform. Track syllabus coverage, participate in the Wednesday Competitive Quiz series (8:00 PM – 10:00 PM), and earn Science Points (SP) redeemable for past papers and academic equipment.
+          </p>
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="navigateTo('quiz')" class="bg-gold hover:bg-gold-dark text-slate-900 px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition flex items-center space-x-2">
+              <span class="material-symbols-outlined text-[18px]">play_circle</span>
+              <span>Launch Quiz Center</span>
+            </button>
+            <button onclick="navigateTo('redemption')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-5 py-2.5 rounded-xl font-bold text-sm transition flex items-center space-x-2">
+              <span class="material-symbols-outlined text-[18px]">card_giftcard</span>
+              <span>Browse Reward Items</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-maroon/10 text-maroon flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">school</span>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase">My Stream</p>
+            <p id="homeUserStreamDisplay" class="text-base font-bold text-slate-800">Physical Science</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">timer</span>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase">Quiz Window</p>
+            <p class="text-base font-bold text-slate-800">Wed 8:00–10 PM</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">stars</span>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase">My Points</p>
+            <p id="homeUserSp" class="text-lg font-bold text-emerald-600">450 SP</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">military_tech</span>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500 uppercase">Milestone Level</p>
+            <p id="homeUserLevelDisplay" class="text-base font-bold text-slate-800">Level 4 Prodigy</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Syllabus Subject Tabs -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">G.C.E. Advanced Level Science Syllabus</h2>
+            <p class="text-xs text-slate-500">Curriculum units filtered for your enrolled academic stream</p>
+          </div>
+          <span class="text-xs font-semibold text-maroon bg-maroon/10 px-3 py-1 rounded-full">National NIE Syllabus</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="subjectCardsContainer">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: QUIZZES (MAIN WEDNESDAY QUIZ & 8 UNIT PHYSICS QUESTION BANKS) -->
+    <section id="view-quiz" class="app-view hidden space-y-6">
+      
+      <!-- Main Wednesday Night Competitive Quiz Card -->
+      <div class="bg-white p-6 sm:p-7 rounded-2xl border-2 border-gold/60 shadow-lg space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase bg-maroon text-white tracking-wider">OFFICIAL EXAMINATION</span>
+              <span id="quizWindowLiveBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center space-x-1">
+                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                <span>Opens Wednesday 8:00 PM – 10:00 PM</span>
+              </span>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 mt-2">Wednesday Main Competitive Physics Quiz</h2>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+              Strictly scheduled every Wednesday night from <strong>8:00 PM to 10:00 PM</strong>. Contains full Sri Lankan A/L curriculum physics questions across all 8 units. Earn SP points and level up your milestone tier!
+            </p>
+          </div>
+
+          <!-- Live Window Controls -->
+          <div class="text-right shrink-0 bg-slate-50 p-4 rounded-xl border border-slate-200 min-w-[210px]">
+            <p class="text-[11px] font-semibold text-slate-500 uppercase">Examination Schedule</p>
+            <p id="wednesdayWindowStatusText" class="text-sm font-bold text-maroon mt-0.5">Checking Schedule...</p>
+            <div class="mt-2 flex items-center justify-end">
+              <span id="wednesdayCountdownBadge" class="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">timer</span>
+                <span id="wednesdayCountdownText">Calculating...</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wednesday Synchronized Paper Banner -->
+        <div class="bg-gradient-to-r from-maroon/5 via-gold/10 to-amber-500/5 p-4 sm:p-5 rounded-2xl border border-gold/40 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+          <div class="flex items-start space-x-3.5">
+            <div class="w-11 h-11 rounded-xl bg-maroon text-gold font-bold flex items-center justify-center shrink-0 shadow-sm">
+              <span class="material-symbols-outlined text-2xl">sync_saved_locally</span>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="font-extrabold text-sm text-slate-900">Synchronized National Examination Engine</h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Same Paper for All Students
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 mt-1 max-w-xl">
+                Questions are <strong>randomized fresh every Wednesday</strong>, and cryptographically synchronized via a weekly seed. All students across Sri Lanka sit the <strong>exact same paper</strong> at the same time.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 text-right shrink-0 bg-white/90 backdrop-blur px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm">
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-400">Weekly Paper Code</p>
+              <p id="wednesdayPaperCodeDisplay" class="text-sm font-black text-maroon font-mono tracking-wide">WED-20260916</p>
+            </div>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-400">Synchronized Seed</p>
+              <p id="wednesdaySeedDisplay" class="text-xs font-mono font-bold text-slate-700">#84920194</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unit Selector & Launch Control -->
+        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Select Physics Unit to Practice or Test:
+              </label>
+              <p class="text-xs text-slate-500">Each of the 8 Sri Lankan A/L units has <strong>100 comprehensive quiz questions</strong>.</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg">
+              800 Total A/L Physics Questions Available
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="physicsUnitsGrid">
+            <!-- Rendered via JS -->
+          </div>
+
+          <!-- Action Button to Start -->
+          <div class="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200">
+            <div class="text-xs text-slate-600">
+              Selected: <strong id="selectedUnitLabel" class="text-maroon">Unit 1: Measurement & Dimensions (100 Questions)</strong>
+            </div>
+            <button onclick="startSelectedUnitQuiz()" id="btnLaunchMainQuiz" class="bg-maroon hover:bg-maroon-dark text-white px-7 py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center space-x-2">
+              <span class="material-symbols-outlined text-[18px]">play_circle</span>
+              <span>Start Unit Quiz (100 Questions)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ACTIVE QUIZ RUNNER MODAL/CONTAINER -->
+        <div id="activeQuizRunner" class="hidden bg-white p-6 rounded-xl border-2 border-maroon space-y-5 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span id="quizSubjectTag" class="text-xs font-bold uppercase bg-maroon text-white px-2.5 py-0.5 rounded">
+                  Unit 1: Measurement
+                </span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                  Paper: <strong id="quizRunnerPaperCode">WED-20260916</strong>
+                </span>
+                <span class="hidden md:inline-flex text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Identical for All Students
+                </span>
+              </div>
+              <h3 id="quizCurrentTitle" class="text-lg font-bold text-slate-900 mt-1">Question 1 of 100</h3>
+            </div>
+            <div class="flex items-center space-x-3 sm:space-x-4">
+              <div class="text-right">
+                <p class="text-xs text-slate-500">Question Progress</p>
+                <p id="quizProgressCount" class="text-sm font-bold text-slate-800">1 / 100</p>
+              </div>
+              <div id="quizTimerWrapper" class="text-right px-3 py-1.5 rounded-xl border border-slate-200 transition-all duration-300">
+                <p id="quizTimerLabel" class="text-[11px] font-semibold text-slate-500 flex items-center justify-end space-x-1">
+                  <span class="material-symbols-outlined text-[13px]">timer</span>
+                  <span>Time Remaining</span>
+                </p>
+                <p id="quizTimerDisplay" class="text-lg font-mono font-bold text-maroon transition-colors duration-300">60:00</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Content Box -->
+          <div id="quizQuestionBox" class="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-inner space-y-4">
+            <p id="quizQuestionText" class="text-base font-semibold text-slate-800">Loading Question...</p>
+            <div id="quizOptionsContainer" class="space-y-2">
+              <!-- Options injected via JS -->
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
+            <div class="flex items-center space-x-3">
+              <button onclick="abandonQuiz()" class="text-xs text-slate-500 hover:text-red-600 font-semibold flex items-center space-x-1">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+                <span>Quit / Abandon</span>
+              </button>
+              <button onclick="askGeminiAboutQuizQuestion()" class="text-xs text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-xl font-bold flex items-center space-x-1.5 transition">
+                <span class="material-symbols-outlined text-[16px] text-amber-500">auto_awesome</span>
+                <span>Ask Gemini AI Concept Hint</span>
+              </button>
+            </div>
+            <button onclick="submitQuizAnswer()" id="btnSubmitQuiz" class="bg-maroon hover:bg-maroon-dark text-white px-7 py-2.5 rounded-xl font-bold text-sm shadow-md transition flex items-center space-x-1.5">
+              <span>Submit & Next Question</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW 3: LEADERBOARD & MILESTONES -->
+    <section id="view-leaderboard" class="app-view hidden space-y-6">
+      
+      <!-- Milestones & Leveling System Section -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="border-b pb-3 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">Account Milestone Rewards & Level Progression</h2>
+            <p class="text-xs text-slate-500">Level up your student account by scoring on Wednesday competitive quizzes!</p>
+          </div>
+          <span class="text-xs bg-gold/20 text-gold-dark font-extrabold px-3 py-1 rounded-full border border-gold/40">
+            Wednesday Quiz XP Engine
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="milestonesCardContainer">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Weekly Leaderboard (Top 10 Science Scholars of the Active Week) -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-xl font-bold text-slate-800">Weekly Leaderboard</h2>
+              <span class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-gold/20 text-gold-dark border border-gold/40">Top 10 Scholars</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Top 10 students for the active exam week based on points earned from the Wednesday Quiz and curriculum units. Resets every Wednesday night.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span id="weeklyLeaderboardBadge" class="text-xs bg-maroon/10 text-maroon border border-maroon/20 font-bold px-3 py-1 rounded-full flex items-center space-x-1.5 shadow-sm">
+              <span class="material-symbols-outlined text-[15px]">event_repeat</span>
+              <span id="weeklyLeaderboardDateDisplay">Active Week: Wednesday Cycle</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[11px]">
+              <tr>
+                <th class="p-3">Weekly Rank</th>
+                <th class="p-3">Student Name</th>
+                <th class="p-3">Role & Stream</th>
+                <th class="p-3">Milestone Tier</th>
+                <th class="p-3 text-emerald-700 font-black">Weekly SP Earned</th>
+                <th class="p-3 text-slate-600">Total SP Balance</th>
+                <th class="p-3 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTableBody" class="divide-y divide-slate-100">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: REDEMPTION CENTER -->
+    <section id="view-redemption" class="app-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">Science Points (SP) Reward Redemption</h2>
+            <p class="text-xs text-slate-500">Exchange your hard-earned quiz points for verified academic tools and past paper books</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-bold text-slate-700">My Balance:</span>
+            <span id="redemptionUserPoints" class="px-3 py-1 bg-gold text-slate-900 font-black rounded-lg text-sm">450 SP</span>
+          </div>
+        </div>
+
+        <!-- Available Items Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="redemptionItemsGrid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Student's Personal Redemption History -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-lg font-bold text-slate-800 border-b pb-3">My Redemption History & Request Status</h3>
+        <div id="userRedemptionHistoryList" class="space-y-3">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: DISCUSSIONS (STREAM RESTRICTED) -->
+    <section id="view-discussions" class="app-view hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-xl font-bold text-slate-800">Academic Discussion Forum</h2>
+              <span id="chatStreamBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-maroon text-white">
+                Physical Science Room
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1" id="chatStreamNotice">
+              Stream-segregated discussion channel. Only students of this stream and teachers/admins have access.
+            </p>
+          </div>
+
+          <!-- Channel switcher visible to Teachers and Admins -->
+          <div id="chatAdminStreamSwitcher" class="hidden flex items-center space-x-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+            <span class="text-xs font-bold text-slate-600 px-2">View Stream:</span>
+            <button onclick="switchChatStream('Physical Science')" id="btnChatPhysical" class="px-3 py-1 rounded-lg text-xs font-bold bg-maroon text-white">Physical Science</button>
+            <button onclick="switchChatStream('Bio Science')" id="btnChatBio" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-slate-700">Bio Science</button>
+          </div>
+        </div>
+
+        <!-- Message List -->
+        <div id="chatMessagesBox" class="h-96 overflow-y-auto p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <!-- Injected via JS -->
+        </div>
+
+        <!-- Input Bar -->
+        <form onsubmit="postChatMessage(event)" class="flex gap-2">
+          <input type="text" id="chatInputMessage" placeholder="Ask a physics question, past paper derivation, or study tip..." required class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-maroon text-sm bg-white" />
+          <button type="submit" class="bg-maroon hover:bg-maroon-dark text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow transition flex items-center space-x-1">
+            <span class="material-symbols-outlined text-[18px]">send</span>
+            <span class="hidden sm:inline">Send</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW 6: ADMIN PORTAL -->
+    <section id="view-admin" class="app-view hidden space-y-6">
+      <!-- Admin Header -->
+      <div class="bg-maroon text-white p-6 rounded-2xl shadow-sm border border-gold/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="material-symbols-outlined text-gold">shield_person</span>
+            <h2 class="text-2xl font-black text-white">Administrator Control Panel</h2>
+          </div>
+          <p class="text-xs text-slate-300 mt-1">Manage users, delete accounts, add/remove redemption store items, and oversee both academic streams</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs bg-white/10 px-3 py-1 rounded-full border border-white/20">Authenticated Admin</span>
+        </div>
+      </div>
+
+      <!-- Admin Sub Tabs -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
+        <div class="flex space-x-2 border-b pb-3 overflow-x-auto">
+          <button onclick="switchAdminTab('users')" id="adminTab-users" class="admin-subtab px-4 py-2 rounded-xl text-xs font-bold bg-maroon text-white flex items-center space-x-2">
+            <span class="material-symbols-outlined text-[18px]">people</span>
+            <span>User Management & Delete</span>
+            <span id="adminPendingUsersCount" class="bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span>
+          </button>
+          <button onclick="switchAdminTab('store')" id="adminTab-store" class="admin-subtab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 flex items-center space-x-2">
+            <span class="material-symbols-outlined text-[18px]">storefront</span>
+            <span>Manage Redemption Store</span>
+          </button>
+          <button onclick="switchAdminTab('redemptions')" id="adminTab-redemptions" class="admin-subtab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 flex items-center space-x-2">
+            <span class="material-symbols-outlined text-[18px]">card_giftcard</span>
+            <span>Student Redemption Requests</span>
+            <span id="adminPendingRedemptionsCount" class="bg-gold text-slate-900 px-1.5 py-0.5 rounded-full text-[10px]">0</span>
+          </button>
+          <button onclick="switchAdminTab('chat')" id="adminTab-chat" class="admin-subtab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 flex items-center space-x-2">
+            <span class="material-symbols-outlined text-[18px]">security</span>
+            <span>Chat Moderation (Both Streams)</span>
+          </button>
+          <button onclick="switchAdminTab('quiz')" id="adminTab-quiz" class="admin-subtab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 flex items-center space-x-2">
+            <span class="material-symbols-outlined text-[18px]">sync_saved_locally</span>
+            <span>Wednesday Exam Randomizer & Sync</span>
+            <span class="bg-emerald-500 text-white px-1.5 py-0.5 rounded-full text-[10px]">LIVE</span>
+          </button>
+        </div>
+
+        <!-- ADMIN TAB 1: USERS & DELETION -->
+        <div id="adminPanel-users" class="admin-panel pt-4 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h3 class="font-bold text-sm text-slate-800">Registered Students, Teachers & Staff</h3>
+              <p class="text-xs text-slate-500">Admin can verify accounts or permanently delete accounts.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="adminUserSearchInput" oninput="renderAdminUsers()" placeholder="Search user name or email..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-maroon focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-[11px]">
+                <tr>
+                  <th class="p-3">Full Name</th>
+                  <th class="p-3">Email Address</th>
+                  <th class="p-3">Role</th>
+                  <th class="p-3">Assigned Stream</th>
+                  <th class="p-3">SP Points</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Admin Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody" class="divide-y divide-slate-100">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB 2: STORE INVENTORY (ADD & REMOVE ITEMS) -->
+        <div id="adminPanel-store" class="admin-panel hidden pt-4 space-y-6">
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+            <h3 class="font-bold text-sm text-slate-900 flex items-center space-x-2">
+              <span class="material-symbols-outlined text-maroon">add_circle</span>
+              <span>Add New Item to Redemption Store</span>
+            </h3>
+            <form onsubmit="handleAdminAddStoreItem(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Item Title</label>
+                <input type="text" id="newStoreTitle" placeholder="e.g. Physics 10-Year Model Papers" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-maroon" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+                <select id="newStoreCategory" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-maroon">
+                  <option value="Past Papers">Past Papers</option>
+                  <option value="Lab Manuals">Lab Manuals</option>
+                  <option value="Equipment">Equipment</option>
+                  <option value="Awards">Awards</option>
+                  <option value="Books">Books</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">SP Price</label>
+                <input type="number" id="newStoreSpPrice" placeholder="e.g. 150" min="10" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-maroon" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Stock Quantity</label>
+                <input type="number" id="newStoreStock" placeholder="e.g. 20" min="1" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-maroon" />
+              </div>
+              <div class="sm:col-span-2 lg:col-span-3">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Description</label>
+                <input type="text" id="newStoreDesc" placeholder="Brief details about what the student receives upon redemption..." required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-maroon" />
+              </div>
+              <div class="flex items-end">
+                <button type="submit" class="w-full bg-maroon hover:bg-maroon-dark text-white font-bold py-2 px-4 rounded-lg text-xs shadow transition flex items-center justify-center space-x-1">
+                  <span class="material-symbols-outlined text-[16px]">add</span>
+                  <span>Publish Item to Store</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-xs uppercase text-slate-500 mb-3">Current Active Store Inventory</h4>
+            <div id="adminStoreItemsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB 3: REDEMPTION REQUESTS -->
+        <div id="adminPanel-redemptions" class="admin-panel hidden pt-4 space-y-4">
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-maroon/5 border border-maroon/20 p-4 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500">Total Requests</p>
+              <p id="adminStatTotalRequests" class="text-2xl font-bold text-maroon">0</p>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+              <p class="text-xs font-semibold text-amber-700">Pending Review</p>
+              <p id="adminStatPendingRequests" class="text-2xl font-bold text-amber-600">0</p>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
+              <p class="text-xs font-semibold text-emerald-700">Fulfilled & Handed Over</p>
+              <p id="adminStatFulfilledRequests" class="text-2xl font-bold text-emerald-600">0</p>
+            </div>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="adminRedemptionSearchInput" oninput="renderAdminRedemptions()" placeholder="Search by student name, email, or item..." class="flex-1 px-4 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-maroon focus:outline-none" />
+            <div class="flex gap-2">
+              <button onclick="setAdminRedemptionFilter('All')" class="admin-red-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-maroon text-white">All</button>
+              <button onclick="setAdminRedemptionFilter('Pending')" class="admin-red-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Pending</button>
+              <button onclick="setAdminRedemptionFilter('Approved')" class="admin-red-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Approved</button>
+              <button onclick="setAdminRedemptionFilter('Fulfilled')" class="admin-red-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Fulfilled</button>
+              <button onclick="setAdminRedemptionFilter('Rejected')" class="admin-red-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Cancelled / Refunded</button>
+            </div>
+          </div>
+
+          <!-- Redemptions List -->
+          <div id="adminRedemptionsListContainer" class="space-y-3">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- ADMIN TAB 4: CHAT MODERATION (BOTH STREAMS) -->
+        <div id="adminPanel-chat" class="admin-panel hidden pt-4 space-y-4">
+          <p class="text-xs text-slate-500">Live monitoring of discussions across both Physical Science and Bio Science streams. Click delete to instantly moderate messages.</p>
+          <div id="adminChatAuditBox" class="space-y-2 max-h-96 overflow-y-auto">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- ADMIN TAB 5: WEDNESDAY EXAM RANDOMIZER & SYNCHRONIZATION -->
+        <div id="adminPanel-quiz" class="admin-panel hidden pt-4 space-y-6">
+          <!-- Information & Realtime Status Box -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-maroon bg-maroon/10 px-2.5 py-0.5 rounded-full">
+                  Centralized Exam Randomizer
+                </span>
+                <h3 class="text-lg font-bold text-slate-900 mt-1">Wednesday Exam Synchronization Engine</h3>
+                <p class="text-xs text-slate-600 mt-0.5 max-w-2xl">
+                  Every Wednesday, questions are completely randomized, but guaranteed to be identical for all students who sit the exam. All client devices are cryptographically bound to the same weekly seed.
+                </p>
+              </div>
+              <div class="shrink-0 bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-right">
+                <span class="text-[10px] uppercase font-bold text-slate-400">Cloud Sync Status</span>
+                <p class="text-xs font-bold text-emerald-600 flex items-center justify-end gap-1 mt-0.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  Firebase Realtime Active
+                </p>
+              </div>
+            </div>
+
+            <!-- Current Synchronized Parameters Card -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white p-4 rounded-xl border border-slate-200">
+              <div>
+                <p class="text-[10px] uppercase font-bold text-slate-400">Current Exam Wednesday</p>
+                <p id="adminCurrentWedDate" class="text-xs sm:text-sm font-black text-slate-900 mt-0.5">Wednesday, Sep 16, 2026</p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase font-bold text-slate-400">Weekly Paper Code</p>
+                <p id="adminCurrentPaperCode" class="text-xs sm:text-sm font-mono font-black text-maroon mt-0.5">WED-20260916</p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase font-bold text-slate-400">Synchronized Cryptographic Seed</p>
+                <p id="adminCurrentSeed" class="text-xs sm:text-sm font-mono font-bold text-slate-700 mt-0.5">#84920194</p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase font-bold text-slate-400">Target Audience</p>
+                <p class="text-xs sm:text-sm font-bold text-emerald-700 mt-0.5">All Enrolled Students (100% Identical)</p>
+              </div>
+            </div>
+
+            <!-- Control Actions for Admin -->
+            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
+              <button onclick="adminForceReseedQuiz()" class="bg-maroon hover:bg-maroon-dark text-white px-4 py-2 rounded-xl text-xs font-bold shadow transition flex items-center space-x-1.5">
+                <span class="material-symbols-outlined text-[16px]">refresh</span>
+                <span>Force Reseed Weekly Paper Now</span>
+              </button>
+              <button onclick="adminAdvanceNextWednesday()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2 rounded-xl text-xs font-bold border border-slate-300 transition flex items-center space-x-1.5">
+                <span class="material-symbols-outlined text-[16px]">skip_next</span>
+                <span>Inspect Next Wednesday (+7 Days)</span>
+              </button>
+              <button onclick="adminResetCalendarWednesday()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2 rounded-xl text-xs font-bold border border-slate-300 transition flex items-center space-x-1.5">
+                <span class="material-symbols-outlined text-[16px]">today</span>
+                <span>Reset to Real-World Wednesday</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Question Paper Inspector / Verification -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
+              <div>
+                <h4 class="font-bold text-sm text-slate-900">Synchronized Paper Question Inspector</h4>
+                <p class="text-xs text-slate-500">Inspect the questions generated for any unit to verify the exact questions and shuffled options all students see this Wednesday.</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <label class="text-xs font-bold text-slate-600">Inspect Paper:</label>
+                <select id="adminInspectUnitSelect" onchange="renderAdminQuestionInspection()" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-maroon focus:outline-none">
+                  <option value="all">🌟 All Units: Wednesday Grand Paper (100 Q)</option>
+                  <option value="1">Unit 1: Measurement & Dimensions</option>
+                  <option value="2">Unit 2: Mechanics</option>
+                  <option value="3">Unit 3: Oscillations & Waves</option>
+                  <option value="4">Unit 4: Thermal Physics</option>
+                  <option value="5">Unit 5: Fields</option>
+                  <option value="6">Unit 6: Current Electricity</option>
+                  <option value="7">Unit 7: Electronics</option>
+                  <option value="8">Unit 8: Modern Physics</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Questions Preview Container -->
+            <div id="adminQuestionInspectorList" class="space-y-3">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 7: MY PROFILE -->
+    <section id="view-profile" class="app-view hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
+          <div class="flex items-center space-x-4">
+            <div id="profileAvatar" class="w-16 h-16 rounded-full bg-maroon text-gold font-black text-2xl flex items-center justify-center border-2 border-gold shadow-md">
+              M
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h2 id="profileFullName" class="text-2xl font-black text-slate-900">M.N.M. Jaasim</h2>
+                <span id="profileRoleBadge" class="text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-maroon text-gold border border-gold/40">ADMIN</span>
+              </div>
+              <p id="profileEmail" class="text-xs text-slate-500 mt-0.5">mnmjaasim@gmail.com</p>
+            </div>
+          </div>
+          <div>
+            <button onclick="handleLogout()" class="px-5 py-2.5 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 text-xs font-bold transition flex items-center space-x-2 shadow-sm">
+              <span class="material-symbols-outlined text-[18px]">logout</span>
+              <span>Sign Out / Log Out</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <p class="text-xs font-semibold text-slate-500">Account Type</p>
+            <p id="profileAccountType" class="text-base font-bold text-slate-800 mt-1">Teacher / Admin</p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <p class="text-xs font-semibold text-slate-500">Assigned Stream</p>
+            <p id="profileStream" class="text-base font-bold text-slate-800 mt-1">Both Streams (All-Access)</p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <p class="text-xs font-semibold text-slate-500">Science Points</p>
+            <p id="profileSpPoints" class="text-base font-black text-gold-dark mt-1">450 SP</p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <p class="text-xs font-semibold text-slate-500">Current Milestone</p>
+            <p id="profileMilestoneDisplay" class="text-base font-bold text-emerald-600 mt-1">🥇 Physics Prodigy</p>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <h3 class="font-bold text-base text-slate-900">Quick Portal Shortcuts</h3>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="navigateTo('quiz')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">Wednesday Physics Quiz (8-10 PM)</button>
+            <button onclick="navigateTo('redemption')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">Redeem SP Rewards</button>
+            <button onclick="navigateTo('discussions')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">Student Discussions</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 8: GEMINI AI ACADEMIC TUTOR -->
+    <section id="view-gemini" class="app-view hidden space-y-4">
+      <!-- Gemini Chat Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-190px)] min-h-[580px]">
+        
+        <!-- Header Controls -->
+        <div class="bg-gradient-to-r from-maroon via-maroon-dark to-purple-950 text-white p-4 sm:px-6 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-gold/30">
+          <div class="flex items-center space-x-3 shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 p-0.5 shadow-md flex items-center justify-center shrink-0">
+              <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                <span class="material-symbols-outlined text-amber-300 text-xl">auto_awesome</span>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                <h2 class="font-extrabold text-base sm:text-lg tracking-tight text-white whitespace-nowrap">Gemini AI Academic Tutor</h2>
+                <span id="geminiStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1 shrink-0">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live A/L AI
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-300">Zahira National College Science Section • Multi-Turn Academic Assistant</p>
+            </div>
+          </div>
+
+          <!-- Controls: Role Selector + Model Selector + Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Tutor Role Selector -->
+            <div class="flex items-center space-x-1.5 bg-black/30 backdrop-blur-sm px-2.5 py-1.5 rounded-xl border border-white/10">
+              <span class="material-symbols-outlined text-[16px] text-amber-300">psychology</span>
+              <label for="geminiRoleSelect" class="text-[10px] font-bold text-slate-300 uppercase tracking-wider hidden sm:inline">Role:</label>
+              <select id="geminiRoleSelect" onchange="onGeminiRoleChange(this.value)" class="bg-slate-900 text-amber-200 text-xs font-semibold rounded-lg px-2 py-1 border border-amber-500/30 focus:outline-none focus:ring-1 focus:ring-amber-400">
+                <option value="general">🔬 All-Round A/L Science Mentor</option>
+                <option value="physics">⚡ Physics Problem Solver</option>
+                <option value="maths">📐 Combined Maths Specialist</option>
+                <option value="chemistry">🧪 Chemistry Master</option>
+                <option value="biology">🧬 Biology Resource Book Expert</option>
+              </select>
+            </div>
+
+            <!-- Model Selector -->
+            <div class="flex items-center space-x-1.5 bg-black/30 backdrop-blur-sm px-2.5 py-1.5 rounded-xl border border-white/10">
+              <span class="material-symbols-outlined text-[16px] text-amber-300">memory</span>
+              <label for="geminiModelSelect" class="text-[10px] font-bold text-slate-300 uppercase tracking-wider hidden sm:inline">Model:</label>
+              <select id="geminiModelSelect" onchange="onGeminiModelChange(this.value)" class="bg-slate-900 text-emerald-300 text-xs font-semibold rounded-lg px-2 py-1 border border-emerald-500/30 focus:outline-none focus:ring-1 focus:ring-emerald-400">
+                <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash (General Tasks)</option>
+                <option value="gemini-3.8-flash">🧠 Gemini 3.8 Flash (High Reasoning)</option>
+                <option value="gemini-3.1-pro-preview">🔬 Gemini 3.1 Pro (Complex Tasks & Proofs)</option>
+                <option value="gemini-3.1-flash-lite">🚀 Gemini 3.1 Flash-Lite (Fast Q&A)</option>
+              </select>
+            </div>
+
+            <!-- Clear, Export & API Settings Buttons -->
+            <div class="flex items-center space-x-1">
+              <button onclick="promptGeminiApiKey()" title="Client API Key (Optional fallback for static hosting)" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition flex items-center">
+                <span class="material-symbols-outlined text-[18px]">key</span>
+              </button>
+              <button onclick="clearGeminiChat()" title="Clear conversation history" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition flex items-center">
+                <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+              </button>
+              <button onclick="exportGeminiChat()" title="Export notes to clipboard" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition flex items-center">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scrollable Conversation Thread -->
+        <div id="geminiChatMessagesContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/50">
+          <div id="geminiChatMessages" class="space-y-4 max-w-4xl mx-auto">
+            <!-- Messages rendered dynamically via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="px-4 py-2 bg-slate-100/90 border-t border-slate-200 overflow-x-auto flex items-center space-x-2 no-scrollbar">
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-amber-500">tips_and_updates</span> Prompts:
+          </span>
+          <button onclick="sendQuickGeminiPrompt('Explain Bernoulli\\'s Principle in fluid dynamics with formula, SI units and Sri Lankan A/L past paper applications.')" class="text-xs bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 px-3 py-1 rounded-full whitespace-nowrap transition shadow-2xs font-medium">
+            ⚡ Bernoulli's Equation Derivation
+          </button>
+          <button onclick="sendQuickGeminiPrompt('Explain how to solve quadratic equations with complex conjugate roots with step-by-step example in Combined Maths.')" class="text-xs bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 px-3 py-1 rounded-full whitespace-nowrap transition shadow-2xs font-medium">
+            📐 Complex Numbers & Quadratics
+          </button>
+          <button onclick="sendQuickGeminiPrompt('Explain Le Chatelier\\'s Principle regarding temperature and pressure changes with the Haber process reaction.')" class="text-xs bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 px-3 py-1 rounded-full whitespace-nowrap transition shadow-2xs font-medium">
+            🧪 Le Chatelier's Principle (Haber)
+          </button>
+          <button onclick="sendQuickGeminiPrompt('Summarize the key differences between C3 and C4 plants in A/L Biology with Kranz anatomy.')" class="text-xs bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 px-3 py-1 rounded-full whitespace-nowrap transition shadow-2xs font-medium">
+            🧬 C3 vs C4 Plants (Kranz Anatomy)
+          </button>
+          <button onclick="sendQuickGeminiPrompt('What are the best strategies to manage time during the Sri Lankan A/L Physics 50-MCQ Paper 1 (2 hours)?')" class="text-xs bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 px-3 py-1 rounded-full whitespace-nowrap transition shadow-2xs font-medium">
+            ⏱️ Physics Paper 1 Time Strategy
+          </button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="p-3 sm:p-4 bg-white border-t border-slate-200">
+          <form onsubmit="handleGeminiFormSubmit(event)" class="max-w-4xl mx-auto flex items-end gap-2">
+            <div class="relative flex-1">
+              <textarea
+                id="geminiChatInput"
+                rows="2"
+                onkeydown="handleGeminiInputKeyDown(event)"
+                placeholder="Ask any syllabus question, formula derivation, past paper problem, or science concept... (Press Enter to send, Shift+Enter for new line)"
+                class="w-full px-4 py-2.5 text-sm text-slate-800 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-maroon focus:border-transparent resize-none leading-relaxed"
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              id="btnGeminiSend"
+              class="px-5 py-2.5 bg-gradient-to-r from-maroon to-maroon-dark hover:from-maroon-dark hover:to-maroon text-white font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center space-x-1.5 shrink-0 h-[46px]"
+            >
+              <span id="geminiSendIcon" class="material-symbols-outlined text-[18px]">send</span>
+              <span id="geminiSendText" class="text-xs font-bold">Send</span>
+            </button>
+          </form>
+          <div class="max-w-4xl mx-auto mt-2 flex items-center justify-between text-[11px] text-slate-400 px-1">
+            <span class="flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Multi-turn conversation history is preserved across queries.
+            </span>
+            <span class="hidden sm:inline">Active Role: <strong id="activeRoleLabel" class="text-slate-600 font-semibold">General Science Mentor</strong></span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FLOATING GEMINI CHATBOT LAUNCHER BUTTON -->
+  <div id="floatingGeminiButton" class="fixed bottom-6 right-6 z-40">
+    <button onclick="openGeminiChatQuick()" class="group relative flex items-center bg-gradient-to-r from-maroon via-maroon-dark to-purple-950 text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl hover:shadow-gold/30 hover:scale-105 border-2 border-gold/60 transition-all duration-300">
+      <span class="material-symbols-outlined text-2xl text-amber-300 group-hover:rotate-12 transition-transform duration-300">auto_awesome</span>
+      <span class="hidden sm:inline-block ml-2 text-xs font-bold tracking-wide">Ask Gemini AI</span>
+      <span class="absolute -top-1 -right-1 flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+      </span>
+    </button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-maroon-dark text-slate-300 text-xs py-8 border-t-2 border-gold/40 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+      <div class="flex items-center space-x-3">
+        <img src="/logo.jpg" alt="Zahira Crest" class="w-8 h-8 rounded-full border border-gold" />
+        <div>
+          <p class="font-bold text-white">Zahira National College Science Portal (ZNC Science)</p>
+          <p class="text-[11px] text-slate-400">Discipline • Dynamism • Dexterity</p>
+        </div>
+      </div>
+      <div class="text-slate-400 text-[11px]">
+        Hosted on Vercel • Synced with Firebase RTDB (e-learing-9adc3)
+      </div>
+    </div>
+  </footer>
+
+  <!-- AUTHENTICATION MODAL (LOGIN & REGISTRATION WITH TEACHER/STUDENT + STREAM SELECTION) -->
+  <div id="loginModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center space-x-2">
+          <img src="/logo.jpg" alt="Logo" class="w-8 h-8 rounded-full border border-gold" />
+          <h3 id="authModalTitle" class="text-lg font-bold text-maroon">Sign In to ZNC Science</h3>
+        </div>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-700">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Auth Switch Tabs (Sign In vs Create Account) -->
+      <div class="flex bg-slate-100 p-1 rounded-xl">
+        <button type="button" onclick="setAuthMode('signin')" id="btnAuthTabSignIn" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-slate-800 shadow-sm">Sign In</button>
+        <button type="button" onclick="setAuthMode('signup')" id="btnAuthTabSignUp" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600">Create Account</button>
+      </div>
+
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-3" id="authForm">
+        <!-- New User Name (Only in Sign Up mode) -->
+        <div id="fieldFullName" class="hidden">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name</label>
+          <input type="text" id="authFullName" placeholder="e.g. Student Full Name" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-maroon bg-white" />
+        </div>
+
+        <!-- Role Selection: Teacher or Student (Only in Sign Up mode) -->
+        <div id="fieldRoleSelection" class="hidden space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-600">I am registering as a:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-300 cursor-pointer hover:bg-slate-50 transition" id="labelRoleStudent">
+              <input type="radio" name="authRole" value="STUDENT" checked onchange="onRoleChanged()" class="text-maroon focus:ring-maroon" />
+              <span class="text-xs font-bold text-slate-800">Student</span>
+            </label>
+            <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-300 cursor-pointer hover:bg-slate-50 transition" id="labelRoleTeacher">
+              <input type="radio" name="authRole" value="TEACHER" onchange="onRoleChanged()" class="text-maroon focus:ring-maroon" />
+              <span class="text-xs font-bold text-slate-800">Teacher / Staff</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Stream Selection (Strictly for Students only: Physical Science or Bio Science) -->
+        <div id="fieldStreamSelection" class="hidden space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-600">Academic Science Stream (Required for Students):</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-300 cursor-pointer hover:bg-slate-50 transition">
+              <input type="radio" name="authStream" value="Physical Science" checked class="text-maroon focus:ring-maroon" />
+              <div>
+                <p class="text-xs font-bold text-slate-800">Physical Science</p>
+                <p class="text-[10px] text-slate-500">Combined Maths & Physics</p>
+              </div>
+            </label>
+            <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-300 cursor-pointer hover:bg-slate-50 transition">
+              <input type="radio" name="authStream" value="Bio Science" class="text-maroon focus:ring-maroon" />
+              <div>
+                <p class="text-xs font-bold text-slate-800">Bio Science</p>
+                <p class="text-[10px] text-slate-500">Biology & Physics</p>
+              </div>
+            </label>
+          </div>
+          <p class="text-[10px] text-slate-500 italic">Notice: You will only access questions & discussions for your selected stream.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="e.g. student@zahira.lk" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-maroon bg-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter password" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-maroon bg-white" />
+        </div>
+
+        <!-- Keep Me Signed In Option -->
+        <div class="flex items-center justify-between py-1">
+          <label class="flex items-center space-x-2 cursor-pointer select-none">
+            <input type="checkbox" id="authKeepSignedIn" class="w-4 h-4 rounded text-maroon focus:ring-maroon border-slate-300 accent-maroon" />
+            <span class="text-xs font-semibold text-slate-700">Keep me signed in</span>
+          </label>
+          <span class="text-[11px] text-slate-400">Preserve session on this device</span>
+        </div>
+
+        <button type="submit" id="btnAuthSubmit" class="w-full bg-maroon hover:bg-maroon-dark text-white font-bold py-2.5 rounded-xl shadow text-sm transition">
+          Sign In to Portal
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOAD PHYSICS QUESTIONS DATA ENGINE -->
+  <script src="/physics_questions.js"></script>
+
+  <!-- APPLICATION JAVASCRIPT LOGIC -->
+  <script src="/app.js"></script>
+</body>
+</html>

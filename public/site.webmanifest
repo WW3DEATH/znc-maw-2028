@@ -1,0 +1,26 @@
+{
+  "name": "ZNC Science 2028 | Zahira College Science",
+  "short_name": "ZNC Science",
+  "description": "Zahira National College Science Portal for Grade 12 Physical & Bio Science",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#580A18",
+  "theme_color": "#580A18",
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
